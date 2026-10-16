@@ -38,6 +38,7 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    document-title: WICit API Documentation
   api-docs:
     path: /v3/api-docs
 
