@@ -1,0 +1,29 @@
+{
+  "name": "wicit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "preview": "vp preview",
+    "test": "vitest",
+    "prepare": "vp config"
+  },
+  "dependencies": {
+    "bootstrap": "6.0.0-alpha.1",
+    "leaflet": "1.9.4"
+  },
+  "devDependencies": {
+    "sass": "^1.105.1",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.11.2",
+      "onFail": "download"
+    }
+  }
+}
