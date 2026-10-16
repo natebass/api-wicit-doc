@@ -59,10 +59,29 @@ header nav a[aria-current="page"] {
     color: var(--fg);
 }
 
+header nav {
+    align-items: center;
+}
+
 header nav a.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: var(--fg);
     font-weight: 600;
     margin-right: auto;
+}
+
+header nav a.brand img {
+    display: block;
+}
+
+/* The logo's wordmark is dark gray. Inverting lightness while keeping hue makes it light on a dark
+   background and leaves the green leaves green. */
+@media (prefers-color-scheme: dark) {
+    header nav a.brand img {
+        filter: invert(1) hue-rotate(180deg);
+    }
 }
 
 main {

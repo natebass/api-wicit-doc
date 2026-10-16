@@ -135,15 +135,31 @@ jooq {
 tasks.named('javadoc') {
     options.windowTitle = 'WICit API'
     options.docTitle = 'WICit API'
+    options.addFileOption('-add-stylesheet', file('src/javadoc/wicit.css'))
 }
 
-// Assembles the GitHub Pages site: the pages in docs/ with the Javadoc under api/.
+// Assembles the GitHub Pages site: the pages in docs/ with the Javadoc under api/. Each Javadoc page gets
+// the site's favicon and, in its navigation bar, the WICit logo linking back to the docs. The links are
+// relative to the page's own folder, so they work under the GitHub Pages project path as well as locally.
 tasks.register('docsSite', Sync) {
     group = 'documentation'
     description = 'Builds the documentation site into build/site.'
     from 'docs'
     from(tasks.named('javadoc')) {
         into 'api'
+        filesMatching('**/*.html') { details ->
+            def root = '../' * (details.relativePath.segments.length - 1)
+            details.filter { line ->
+                if (line == '<head>') {
+                    return "<head>\n<link rel=\"icon\" href=\"${root}favicon.ico\">"
+                }
+                if (line.startsWith('<ul id="navbar-top-firstrow"')) {
+                    return "<a class=\"wicit-logo\" href=\"${root}index.html\"><img alt=\"WICit docs\" height=\"20\" " +
+                            "src=\"${root}logo.svg\" width=\"50\"></a>\n${line}"
+                }
+                line
+            }
+        }
     }
     into layout.buildDirectory.dir('site')
 }
