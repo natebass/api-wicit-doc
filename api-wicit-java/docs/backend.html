@@ -12,6 +12,7 @@
         <a class="brand" href="index.html">WICit Docs</a>
         <a href="prerequisites.html">Prerequisites</a>
         <a aria-current="page" href="backend.html">Backend</a>
+        <a href="deploy.html">Deployment</a>
         <a href="frontend.html">Frontend</a>
         <a href="data.html">Data</a>
         <a href="api/index.html">Javadoc</a>
@@ -234,7 +235,7 @@ DB_PASSWORD=your-password</code></pre>
         so forks such as <code>opensacorg.github.io/wicit</code> and <code>natebass.github.io/wicit</code> work without
         changes. The API is read-only and only allows <code>GET</code> requests.</p>
 
-    <h2>Set up the database</h2>
+    <h2 id="set-up-the-database">Set up the database</h2>
     <ol>
         <li>Create the database and user in PostgreSQL, if they do not exist.</li>
         <li>Put the connection settings in <code>api-wicit-java/.env</code>, as above.</li>
@@ -382,27 +383,8 @@ DB_PASSWORD=your-password</code></pre>
         <code>{"status":404,"title":"Not Found","detail":"…"}</code>.</p>
 
     <h2>Deployment</h2>
-    <p>The API runs on an AWS EC2 instance (<code>t2.micro</code>, <code>us-west-2a</code>) with PostgreSQL installed on
-        the same machine.</p>
-    <ol>
-        <li>Build the jar with <code>./gradlew bootJar</code>. It is written to <code>build/libs/</code> and includes
-            the dataset files.
-        </li>
-        <li>Load the database from your machine by pointing Liquibase at the server, for example through an SSH tunnel
-            to port 5432:
-            <pre><code>DB_URL=jdbc:postgresql://localhost:5432/app_28c3 DB_USERNAME=... DB_PASSWORD=... ./gradlew update</code></pre>
-        </li>
-        <li>On the server, run the jar with <code>SPRING_PROFILES_ACTIVE=prod</code> and the <code>DB_</code> variables
-            set, for example from a systemd service. A <code>t2.micro</code> has 1 GB of memory, so cap the heap with
-            <code>-Xmx384m</code>.
-        </li>
-        <li>Serve it over HTTPS. The website is served over HTTPS from GitHub Pages, and browsers block its requests to
-            a plain HTTP API. Put a reverse proxy such as Caddy or nginx with a Let's Encrypt certificate in front of
-            port 8080, on a domain name such as <code>api.findwic.com</code>, then set <code>VITE_API_BASE_URL</code> to
-            that URL. The API honors the proxy's <code>X-Forwarded-*</code> headers.
-        </li>
-        <li>Point the load balancer or monitoring at <code>/actuator/health</code>.</li>
-    </ol>
+    <p>The API runs on an AWS EC2 instance with PostgreSQL on the same machine, behind Caddy for HTTPS. See
+        <a href="deploy.html">Deployment</a> for the full setup.</p>
 
     <h2>Documentation site</h2>
     <p>The <code>docsSite</code> Gradle task generates the Javadoc and copies it to <code>build/site/api</code>, next to
