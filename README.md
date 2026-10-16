@@ -1,4 +1,4 @@
-# WICit documentation.
+# WICit documentation
 
 Learn about and experiment with the WICit website. 
 
