@@ -21,7 +21,7 @@ INDENT := $(EMPTY)  $(EMPTY)
 .DEFAULT_GOAL := help
 .PHONY: help install build test clean \
 	frontend frontend-install frontend-build frontend-preview frontend-test \
-	backend backend-build backend-test backend-clean docs
+	backend backend-db backend-build backend-test backend-clean docs
 
 help:
 	$(info Usage: make <target>)
@@ -35,6 +35,7 @@ help:
 	$(info )
 	$(info Backend ($(BACKEND_DIR), Spring Boot + Gradle))
 	$(info $(INDENT)backend            Run the API (bootRun))
+	$(info $(INDENT)backend-db         Create the schema and load the CSV data (Liquibase update))
 	$(info $(INDENT)backend-build      Build the API)
 	$(info $(INDENT)backend-test       Run tests)
 	$(info $(INDENT)backend-clean      Remove build output)
@@ -68,6 +69,9 @@ frontend-test: frontend-install
 
 backend:
 	cd $(BACKEND_DIR) && $(GRADLE) bootRun
+
+backend-db:
+	cd $(BACKEND_DIR) && $(GRADLE) update
 
 backend-build:
 	cd $(BACKEND_DIR) && $(GRADLE) build -x test

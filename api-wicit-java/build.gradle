@@ -1,7 +1,20 @@
+// The Liquibase Gradle plugin reads Liquibase's command definitions at configuration time.
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.liquibase:liquibase-core:4.33.0'
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.liquibase.gradle' version '3.1.0'
+    // Keep in step with the jOOQ version managed by Spring Boot.
+    id 'org.jooq.jooq-codegen-gradle' version '3.21.7'
 }
 
 group = 'org.opensac'
@@ -18,14 +31,105 @@ repositories {
     mavenCentral()
 }
 
+// Tests build their schema with the same Liquibase version as the Gradle tasks.
+ext['liquibase.version'] = '4.33.0'
+
+// The jOOQ classes generated from the database schema (./gradlew jooqCodegen) are committed here, so
+// building the API does not need a database.
+sourceSets {
+    main {
+        java {
+            srcDir 'src/generated/jooq'
+        }
+    }
+}
+
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1'
+    runtimeOnly 'org.postgresql:postgresql'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-jooq-test'
+    // Tests run the schema changesets against H2. The app itself does not run Liquibase.
+    testImplementation 'org.springframework.boot:spring-boot-starter-liquibase'
+    testRuntimeOnly 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Classpath for the Liquibase Gradle tasks (./gradlew update). The app itself does not run Liquibase.
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.33.0'
+    liquibaseRuntime 'info.picocli:picocli:4.7.7'
+    liquibaseRuntime 'org.postgresql:postgresql'
+
+    jooqCodegen 'org.postgresql:postgresql'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// Database settings for the Liquibase tasks. Each value comes from an environment variable, then from
+// the git-ignored .env file, then from the local development default. The password has no default.
+def dotenv = [:]
+def dotenvFile = file('.env')
+if (dotenvFile.exists()) {
+    dotenvFile.eachLine { line ->
+        def match = line =~ /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/
+        if (match.matches()) {
+            dotenv[match.group(1)] = match.group(2).replaceAll(/^(["'])(.*)\1$/, '$2')
+        }
+    }
+}
+def setting = { String key, String fallback = '' -> System.getenv(key) ?: dotenv[key] ?: fallback }
+
+// ./gradlew update creates the schema and loads the CSV files in src/main/resources into the database.
+liquibase {
+    activities {
+        main {
+            changelogFile 'db/changelog/db.changelog-master.yaml'
+            searchPath 'src/main/resources'
+            url setting('DB_URL', 'jdbc:postgresql://localhost:5432/app_28c3')
+            username setting('DB_USERNAME', 'nateb')
+            password setting('DB_PASSWORD')
+        }
+    }
+}
+
+// ./gradlew jooqCodegen regenerates the jOOQ table classes in src/generated/jooq from the database that
+// ./gradlew update migrated. Run both after changing the schema, then commit the generated classes.
+jooq {
+    configuration {
+        jdbc {
+            driver = 'org.postgresql.Driver'
+            url = setting('DB_URL', 'jdbc:postgresql://localhost:5432/app_28c3')
+            user = setting('DB_USERNAME', 'nateb')
+            password = setting('DB_PASSWORD')
+        }
+        generator {
+            database {
+                name = 'org.jooq.meta.postgres.PostgresDatabase'
+                inputSchema = 'public'
+                // Only the application tables, not Liquibase's own. routines = false leaves out the seed functions.
+                excludes = 'databasechangelog.*|stg_.*'
+            }
+            generate {
+                routines = false
+                records = true
+                pojos = false
+                daos = false
+                javadoc = true
+                generatedAnnotation = false
+            }
+            target {
+                packageName = 'org.opensac.wicitapi.jooq'
+                directory = 'src/generated/jooq'
+            }
+        }
+    }
 }
 
 tasks.named('javadoc') {

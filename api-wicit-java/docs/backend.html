@@ -1,75 +1,417 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Backend Setup · WICit Docs</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Backend Setup · WICit Docs</title>
+    <link href="style.css" rel="stylesheet">
 </head>
 <body>
-  <header>
+<header>
     <nav>
-      <a class="brand" href="index.html">WICit Docs</a>
-      <a href="prerequisites.html">Prerequisites</a>
-      <a href="backend.html" aria-current="page">Backend</a>
-      <a href="frontend.html">Frontend</a>
-      <a href="api/index.html">Javadoc</a>
+        <a class="brand" href="index.html">WICit Docs</a>
+        <a href="prerequisites.html">Prerequisites</a>
+        <a aria-current="page" href="backend.html">Backend</a>
+        <a href="frontend.html">Frontend</a>
+        <a href="data.html">Data</a>
+        <a href="api/index.html">Javadoc</a>
     </nav>
-  </header>
-  <main>
+</header>
+<main>
     <h1>Backend setup</h1>
-    <p class="lead">The WICit API is a Spring Boot application in <code>api-wicit-java</code>, built with Gradle.</p>
+    <p class="lead">The WICit API is a Spring Boot application in <code>api-wicit-java</code>, built with Gradle. It
+        serves the <a href="data.html">published WIC data</a> to the website from PostgreSQL.</p>
 
     <h2>Requirements</h2>
     <table>
-      <thead><tr><th>Component</th><th>Version</th></tr></thead>
-      <tbody>
-        <tr><td>Java (toolchain)</td><td>27</td></tr>
-        <tr><td>Gradle (wrapper)</td><td>9.8.1</td></tr>
-        <tr><td>Spring Boot</td><td>4.1.1</td></tr>
-        <tr><td>Spring dependency management plugin</td><td>1.1.7</td></tr>
-        <tr><td>Tests</td><td>JUnit Platform via <code>spring-boot-starter-test</code></td></tr>
-      </tbody>
+        <thead>
+        <tr>
+            <th>Component</th>
+            <th>Version</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Java (toolchain)</td>
+            <td>27</td>
+        </tr>
+        <tr>
+            <td>Gradle (wrapper)</td>
+            <td>9.8.1</td>
+        </tr>
+        <tr>
+            <td>Spring Boot</td>
+            <td>4.1.1</td>
+        </tr>
+        <tr>
+            <td>Spring dependency management plugin</td>
+            <td>1.1.7</td>
+        </tr>
+        <tr>
+            <td>PostgreSQL</td>
+            <td>18 (any recent version works)</td>
+        </tr>
+        <tr>
+            <td>Liquibase</td>
+            <td>4.33.0, run by the <code>org.liquibase.gradle</code> plugin 3.1.0</td>
+        </tr>
+        <tr>
+            <td>jOOQ</td>
+            <td>3.21.7, the version Spring Boot manages, with the <code>org.jooq.jooq-codegen-gradle</code> plugin</td>
+        </tr>
+        <tr>
+            <td>springdoc-openapi</td>
+            <td>3.1.1</td>
+        </tr>
+        </tbody>
     </table>
     <p>See <a href="prerequisites.html">Prerequisites</a> to install the JDK.</p>
 
-    <h2>Project layout</h2>
+    <h3>Starters</h3>
+    <p>Spring Boot 4 split the old <code>spring-boot-starter-web</code> into smaller starters, each with a matching test
+        starter.</p>
     <table>
-      <thead><tr><th>Path</th><th>What it is</th></tr></thead>
-      <tbody>
-        <tr><td><code>build.gradle</code></td><td>Plugins, Java toolchain, dependencies and the docs site task.</td></tr>
-        <tr><td><code>src/main/java/org/opensac/wicitapi/</code></td><td>Application source. <code>Application</code> is the entry point.</td></tr>
-        <tr><td><code>src/main/resources/application.properties</code></td><td>Spring configuration. The application name is <code>wicit-api</code>.</td></tr>
-        <tr><td><code>src/test/java/</code></td><td>Tests.</td></tr>
-        <tr><td><code>docs/</code></td><td>Source pages for this documentation site.</td></tr>
-      </tbody>
+        <thead>
+        <tr>
+            <th>Starter</th>
+            <th>What it adds</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>spring-boot-starter-webmvc</code></td>
+            <td>Spring MVC and Tomcat for the REST API.</td>
+        </tr>
+        <tr>
+            <td><code>spring-boot-starter-jooq</code></td>
+            <td>jOOQ for type-safe SQL, with a <code>DSLContext</code> bound to Spring's transactions.</td>
+        </tr>
+        <tr>
+            <td><code>spring-boot-starter-actuator</code></td>
+            <td>Health checks at <code>/actuator/health</code>.</td>
+        </tr>
+        <tr>
+            <td><code>spring-boot-starter-validation</code></td>
+            <td>Validation of request parameters.</td>
+        </tr>
+        <tr>
+            <td><code>springdoc-openapi-starter-webmvc-ui</code></td>
+            <td>The OpenAPI document and Swagger UI.</td>
+        </tr>
+        <tr>
+            <td><code>spring-boot-starter-webmvc-test</code>, <code>spring-boot-starter-jooq-test</code></td>
+            <td><code>@WebMvcTest</code> and <code>@JooqTest</code> slices. Database tests use an in-memory H2 database
+                that Liquibase builds from the schema changesets (<code>spring-boot-starter-liquibase</code>, tests
+                only).
+                Annotate them with <code>@DatabaseTest</code>.
+            </td>
+        </tr>
+        </tbody>
     </table>
 
+    <h2>Project layout</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Path</th>
+            <th>What it is</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>build.gradle</code></td>
+            <td>Plugins, Java toolchain, dependencies, the Liquibase activity, jOOQ code generation and the docs site
+                task.
+            </td>
+        </tr>
+        <tr>
+            <td><code>src/generated/jooq/</code></td>
+            <td>jOOQ classes generated from the database schema: one class per table (such as <code>Tables.VENDOR</code>)
+                and one record class per row type. Generated by <code>./gradlew jooqCodegen</code> and committed; never
+                edit them by hand.
+            </td>
+        </tr>
+        <tr>
+            <td><code>src/main/java/org/opensac/wicitapi/</code></td>
+            <td>Application source, one package per dataset: <code>vendor</code>, <code>product</code>, <code>farmersmarket</code>,
+                <code>participants</code>, <code>redemption</code> and <code>dataset</code> (file downloads). <code>config</code>
+                holds CORS, OpenAPI and jOOQ settings; <code>common</code> holds paging and shared query conditions.
+            </td>
+        </tr>
+        <tr>
+            <td><code>src/main/resources/application.yaml</code></td>
+            <td>Spring configuration, with <code>dev</code> and <code>prod</code> profiles.</td>
+        </tr>
+        <tr>
+            <td><code>src/main/resources/db/changelog/</code></td>
+            <td>Liquibase changelogs: the schema and the CSV seed.</td>
+        </tr>
+        <tr>
+            <td><code>src/main/resources/&lt;dataset&gt;/</code></td>
+            <td>The published data files. See <a href="data.html">Data</a>.</td>
+        </tr>
+        <tr>
+            <td><code>src/test/</code></td>
+            <td>Tests, <code>DatabaseTest</code> (the database test slice), and <code>application-test.yaml</code> for
+                the H2 test database.
+            </td>
+        </tr>
+        <tr>
+            <td><code>docs/</code></td>
+            <td>Source pages for this documentation site.</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>Each package follows the same shape: a <code>@Repository</code> that runs jOOQ queries against the generated
+        table classes and maps rows to response records, a <code>@Service</code> that holds the logic (limits, paging),
+        and a thin <code>@RestController</code>. Dependencies come in through constructors, so tests can build a
+        service with a fake repository.</p>
+    <p>jOOQ renders table and column names without quotes (see <code>config/JooqConfig.java</code>). Every name in the
+        schema is lower case, so PostgreSQL reads them the same way, and the H2 test database matches them too.</p>
+
     <h2>Configuration</h2>
-    <p>Sensitive settings for the API go in a <code>.env</code> file at the repository root. It is ignored by Git, so never commit it. Ask a maintainer for the values.</p>
+    <p>Settings are in <code>application.yaml</code>. Secrets are never stored there: they come from environment
+        variables. For local development, the API and Gradle also read a <code>.env</code> file in
+        <code>api-wicit-java</code>. It is ignored by Git, so never commit it. Write values without quotes:</p>
+    <pre><code>DB_URL=jdbc:postgresql://localhost:5432/app_28c3
+DB_USERNAME=nateb
+DB_PASSWORD=your-password</code></pre>
+    <table>
+        <thead>
+        <tr>
+            <th>Variable</th>
+            <th>Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>DB_URL</code></td>
+            <td>JDBC URL of the database. The <code>dev</code> profile defaults to <code>jdbc:postgresql://localhost:5432/app_28c3</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>DB_USERNAME</code></td>
+            <td>Database user. The <code>dev</code> profile defaults to <code>nateb</code>.</td>
+        </tr>
+        <tr>
+            <td><code>DB_PASSWORD</code></td>
+            <td>Database password. No default.</td>
+        </tr>
+        <tr>
+            <td><code>SPRING_PROFILES_ACTIVE</code></td>
+            <td><code>dev</code> (the default) or <code>prod</code>.</td>
+        </tr>
+        <tr>
+            <td><code>PORT</code></td>
+            <td>HTTP port in the <code>prod</code> profile. Defaults to 8080.</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3>Profiles</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Profile</th>
+            <th>Differences</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>dev</code></td>
+            <td>Database defaults for a local PostgreSQL. Allows browser requests from the Vite dev server (<code>localhost:5173</code>)
+                and preview server (<code>localhost:4173</code>). Health details are shown.
+            </td>
+        </tr>
+        <tr>
+            <td><code>prod</code></td>
+            <td>Every database setting must come from the environment. Health details are hidden.</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3>Allowed origins (CORS)</h3>
+    <p>The website runs on a different origin from the API, so the API lists the origins allowed to call it under <code>wicit.cors.allowed-origin-patterns</code>.
+        Every profile allows <code>https://findwic.com</code>, <code>https://www.findwic.com</code> and <code>https://*.github.io</code>,
+        so forks such as <code>opensacorg.github.io/wicit</code> and <code>natebass.github.io/wicit</code> work without
+        changes. The API is read-only and only allows <code>GET</code> requests.</p>
+
+    <h2>Set up the database</h2>
+    <ol>
+        <li>Create the database and user in PostgreSQL, if they do not exist.</li>
+        <li>Put the connection settings in <code>api-wicit-java/.env</code>, as above.</li>
+        <li>Create the schema and load the CSV files:
+            <pre><code>cd api-wicit-java
+./gradlew update</code></pre>
+        </li>
+    </ol>
+    <p>The first run takes about two minutes. Later runs only reload datasets whose files changed. See <a
+            href="data.html#how-the-files-get-into-the-database">how the files get into the database</a>.</p>
+    <p>Other useful Liquibase tasks:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Command</th>
+            <th>What it does</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>./gradlew status</code></td>
+            <td>Lists changesets that have not run yet.</td>
+        </tr>
+        <tr>
+            <td><code>./gradlew history</code></td>
+            <td>Lists the changesets that have run.</td>
+        </tr>
+        <tr>
+            <td><code>./gradlew update -PliquibaseContexts=schema</code></td>
+            <td>Applies schema changes without loading data.</td>
+        </tr>
+        <tr>
+            <td><code>./gradlew dropAll</code></td>
+            <td>Drops every table, to start over. Never run it against production.</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>To update the data, replace the files in <code>src/main/resources/&lt;dataset&gt;/</code> with a newer download
+        and run <code>./gradlew update</code>.</p>
+
+    <h3>Change the schema</h3>
+    <ol>
+        <li>Add a new file under <code>db/changelog/schema/</code> and include it in
+            <code>db.changelog-master.yaml</code>.
+            Never edit a schema changeset that has already run.
+        </li>
+        <li>Apply it to your local database with <code>./gradlew update</code>.</li>
+        <li>Regenerate the jOOQ classes from that database with <code>./gradlew jooqCodegen</code>. It reads the same
+            <code>DB_</code> settings as Liquibase.
+        </li>
+        <li>Commit the changelog and the changed files in <code>src/generated/jooq/</code> together.</li>
+    </ol>
+    <p>The generated classes are committed so that building the API, and the documentation workflow, never need a
+        database. If a query no longer compiles after regenerating, the schema change broke it.</p>
 
     <h2>Run, build and test</h2>
     <p>From the repository root:</p>
     <table>
-      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
-      <tbody>
-        <tr><td><code>make backend</code></td><td>Runs the API with <code>bootRun</code>.</td></tr>
-        <tr><td><code>make backend-build</code></td><td>Compiles and packages the API, skipping tests.</td></tr>
-        <tr><td><code>make backend-test</code></td><td>Runs the tests.</td></tr>
-        <tr><td><code>make backend-clean</code></td><td>Deletes the <code>build/</code> folder.</td></tr>
-        <tr><td><code>make docs</code></td><td>Builds this site with the Javadoc into <code>api-wicit-java/build/site</code>.</td></tr>
-      </tbody>
+        <thead>
+        <tr>
+            <th>Command</th>
+            <th>What it does</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>make backend-db</code></td>
+            <td>Creates the schema and loads the CSV files with <code>./gradlew update</code>.</td>
+        </tr>
+        <tr>
+            <td><code>make backend</code></td>
+            <td>Runs the API at <a href="http://localhost:8080">localhost:8080</a> with <code>bootRun</code>.</td>
+        </tr>
+        <tr>
+            <td><code>make backend-build</code></td>
+            <td>Compiles and packages the API, skipping tests.</td>
+        </tr>
+        <tr>
+            <td><code>make backend-test</code></td>
+            <td>Runs the tests. They use H2 and do not need PostgreSQL.</td>
+        </tr>
+        <tr>
+            <td><code>make backend-clean</code></td>
+            <td>Deletes the <code>build/</code> folder.</td>
+        </tr>
+        <tr>
+            <td><code>make docs</code></td>
+            <td>Builds this site with the Javadoc into <code>api-wicit-java/build/site</code>.</td>
+        </tr>
+        </tbody>
     </table>
-    <p>Without Make, run Gradle from <code>api-wicit-java</code>. Use <code>gradlew.bat</code> on Windows and <code>./gradlew</code> on macOS and Linux:</p>
-<pre><code>cd api-wicit-java
+    <p>Without Make, run Gradle from <code>api-wicit-java</code>. Use <code>gradlew.bat</code> on Windows and <code>./gradlew</code>
+        on macOS and Linux:</p>
+    <pre><code>cd api-wicit-java
 ./gradlew bootRun
 ./gradlew test
 ./gradlew docsSite</code></pre>
 
+    <h2>Endpoints</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Path</th>
+            <th>What it serves</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>/api/vendors</code>, <code>/api/vendors/in-bounds</code></td>
+            <td><a href="data-vendors.html">Authorized vendors</a>, for the map.</td>
+        </tr>
+        <tr>
+            <td><code>/api/products</code></td>
+            <td><a href="data-products.html">Authorized products</a>, for the food search.</td>
+        </tr>
+        <tr>
+            <td><code>/api/farmers-markets</code>, <code>/api/farmers</code></td>
+            <td><a href="data-farmers-markets.html">Farmers and farmers' markets</a>.</td>
+        </tr>
+        <tr>
+            <td><code>/api/participants/…</code></td>
+            <td><a href="data-participants.html">Participants by county</a>.</td>
+        </tr>
+        <tr>
+            <td><code>/api/redemptions/…</code></td>
+            <td><a href="data-redemptions.html">Redemptions by county</a>.</td>
+        </tr>
+        <tr>
+            <td><code>/api/datasets</code></td>
+            <td>Downloads of the original published files.</td>
+        </tr>
+        <tr>
+            <td><code>/swagger-ui.html</code></td>
+            <td>Interactive API reference. The OpenAPI document is at <code>/v3/api-docs</code>.</td>
+        </tr>
+        <tr>
+            <td><code>/actuator/health</code></td>
+            <td>Health check, including the database connection. <code>/actuator/health/liveness</code> and <code>/actuator/health/readiness</code>
+                are also available.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p>Errors are returned as <a href="https://www.rfc-editor.org/rfc/rfc9457">RFC 9457</a> problem details, such as
+        <code>{"status":404,"title":"Not Found","detail":"…"}</code>.</p>
+
+    <h2>Deployment</h2>
+    <p>The API runs on an AWS EC2 instance (<code>t2.micro</code>, <code>us-west-2a</code>) with PostgreSQL installed on
+        the same machine.</p>
+    <ol>
+        <li>Build the jar with <code>./gradlew bootJar</code>. It is written to <code>build/libs/</code> and includes
+            the dataset files.
+        </li>
+        <li>Load the database from your machine by pointing Liquibase at the server, for example through an SSH tunnel
+            to port 5432:
+            <pre><code>DB_URL=jdbc:postgresql://localhost:5432/app_28c3 DB_USERNAME=... DB_PASSWORD=... ./gradlew update</code></pre>
+        </li>
+        <li>On the server, run the jar with <code>SPRING_PROFILES_ACTIVE=prod</code> and the <code>DB_</code> variables
+            set, for example from a systemd service. A <code>t2.micro</code> has 1 GB of memory, so cap the heap with
+            <code>-Xmx384m</code>.
+        </li>
+        <li>Serve it over HTTPS. The website is served over HTTPS from GitHub Pages, and browsers block its requests to
+            a plain HTTP API. Put a reverse proxy such as Caddy or nginx with a Let's Encrypt certificate in front of
+            port 8080, on a domain name such as <code>api.findwic.com</code>, then set <code>VITE_API_BASE_URL</code> to
+            that URL. The API honors the proxy's <code>X-Forwarded-*</code> headers.
+        </li>
+        <li>Point the load balancer or monitoring at <code>/actuator/health</code>.</li>
+    </ol>
+
     <h2>Documentation site</h2>
-    <p>The <code>docsSite</code> Gradle task generates the Javadoc and copies it to <code>build/site/api</code>, next to the pages from <code>docs/</code>. Open <code>build/site/index.html</code> in a browser to preview the site.</p>
-    <p>On every push to <code>master</code> that changes <code>api-wicit-java/</code>, the <code>Deploy docs to GitHub Pages</code> workflow builds the site and publishes it to <a href="https://natebass.github.io/api-wicit-doc/">natebass.github.io/api-wicit-doc</a>.</p>
-    <p>Write Javadoc comments on public classes and methods. They appear in the <a href="api/index.html">API reference</a>.</p>
-  </main>
+    <p>The <code>docsSite</code> Gradle task generates the Javadoc and copies it to <code>build/site/api</code>, next to
+        the pages from <code>docs/</code>. Open <code>build/site/index.html</code> in a browser to preview the site.</p>
+    <p>On every push to <code>master</code> that changes <code>api-wicit-java/</code>, the <code>Deploy docs to GitHub
+        Pages</code> workflow builds the site and publishes it to <a href="https://natebass.github.io/api-wicit-doc/">natebass.github.io/api-wicit-doc</a>.
+    </p>
+    <p>Write Javadoc comments on public classes and methods. They appear in the <a href="api/index.html">API
+        reference</a>.</p>
+</main>
 </body>
 </html>
