@@ -4,11 +4,13 @@ Learn about and experiment with the WICit website.
 
 ## Running locally
 
-Use Make to run commands from the root of the repository. For development, it is recommended to open the frontend and backend separately in an IDE.
+Use Make to run commands from the root of the repository. See the available commands [here](./Makefile).
+
+For development, it is recommended to open the frontend and backend separately in an IDE.
 
 ## Deployment
 
-This documentation website is deployed to GitHub Pages.
+This documentation website is deployed to GitHub Pages. See [deploy-docs.yml](./.github/workflows/deploy-docs.yml).
 
 ## Security
 
