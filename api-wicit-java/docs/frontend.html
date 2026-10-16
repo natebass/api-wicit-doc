@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frontend Setup · WICit Docs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a class="brand" href="index.html">WICit Docs</a>
+      <a href="prerequisites.html">Prerequisites</a>
+      <a href="backend.html">Backend</a>
+      <a href="frontend.html" aria-current="page">Frontend</a>
+      <a href="api/index.html">Javadoc</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Frontend setup</h1>
+    <p class="lead">The WICit website is in <code>wicit</code>. It is built with Vite+ and uses pnpm to manage packages.</p>
+
+    <h2>Requirements</h2>
+    <table>
+      <thead><tr><th>Component</th><th>Version</th></tr></thead>
+      <tbody>
+        <tr><td>Node.js</td><td>24</td></tr>
+        <tr><td>Vite+ (<code>vp</code>)</td><td>Pinned in <code>pnpm-workspace.yaml</code> under <code>catalog</code></td></tr>
+        <tr><td>pnpm</td><td>Pinned in <code>devEngines</code> in <code>package.json</code></td></tr>
+        <tr><td>Bootstrap</td><td>v6 development build from GitHub</td></tr>
+        <tr><td>Leaflet</td><td>1.9.4</td></tr>
+        <tr><td>Sass</td><td>1.x</td></tr>
+      </tbody>
+    </table>
+    <p>See <a href="prerequisites.html">Prerequisites</a> to install Node.js and Vite+.</p>
+
+    <h2>Project layout</h2>
+    <table>
+      <thead><tr><th>Path</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td><code>index.html</code></td><td>The page Vite serves and builds.</td></tr>
+        <tr><td><code>src/main.js</code></td><td>Entry script.</td></tr>
+        <tr><td><code>src/js/</code></td><td>Application code, including <code>lib/config.js</code> and <code>i18n/</code>.</td></tr>
+        <tr><td><code>src/scss/</code></td><td>Styles.</td></tr>
+        <tr><td><code>public/</code></td><td>Static files copied as is.</td></tr>
+        <tr><td><code>tests/</code></td><td>Vitest tests.</td></tr>
+        <tr><td><code>vite.config.js</code></td><td>Vite+ configuration.</td></tr>
+        <tr><td><code>.env.dist</code></td><td>Template for <code>.env</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Configuration</h2>
+    <p>Copy the template to create your local environment file:</p>
+<pre><code>cd wicit
+cp .env.dist .env</code></pre>
+    <table>
+      <thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>VITE_MAPBOX_INTEGRATION_URL</code></td><td>Mapbox raster tile URL for the map. Required. Set it in <code>.env</code> only, never in <code>.env.dist</code>.</td></tr>
+        <tr><td><code>VITE_LOCATIONS_API_URL</code></td><td>California WIC vendor locations API (CHHS datastore SQL). The template sets a default.</td></tr>
+        <tr><td><code>VITE_LOCATIONS_RESOURCE_ID</code></td><td>CHHS dataset ID for vendor locations. The template sets a default.</td></tr>
+      </tbody>
+    </table>
+    <h3>Get a Mapbox URL</h3>
+    <ol>
+      <li>Go to <a href="https://www.mapbox.com/studio/">Mapbox Studio</a> and click <strong>New style</strong>.</li>
+      <li>Select <strong>Classic styles</strong> → <strong>Streets</strong>, then click <strong>Customize</strong>.</li>
+      <li>Click <strong>Share</strong>. Under <strong>Production URL</strong>, copy the <strong>Preview only</strong> URL.</li>
+      <li>Paste it as <code>VITE_MAPBOX_INTEGRATION_URL</code> in <code>.env</code>.</li>
+    </ol>
+    <p class="note">Every <code>VITE_</code> variable ends up in the public browser bundle. Restrict the Mapbox token to your URLs in Mapbox's settings.</p>
+
+    <h2>Run, build and test</h2>
+    <p>From the repository root:</p>
+    <table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>make frontend</code></td><td>Installs packages and starts the dev server at <a href="http://localhost:5173">localhost:5173</a>.</td></tr>
+        <tr><td><code>make frontend-install</code></td><td>Installs packages.</td></tr>
+        <tr><td><code>make frontend-build</code></td><td>Builds the production site into <code>wicit/dist</code>.</td></tr>
+        <tr><td><code>make frontend-preview</code></td><td>Builds, then serves the production build.</td></tr>
+        <tr><td><code>make frontend-test</code></td><td>Runs the Vitest tests once.</td></tr>
+      </tbody>
+    </table>
+    <p>Without Make, run Vite+ from <code>wicit</code>:</p>
+<pre><code>cd wicit
+pnpm install
+vp dev
+vp test
+vp check
+vp build</code></pre>
+
+    <h2>Translations</h2>
+    <p>Every string is rendered through a message catalog. English, in <code>src/js/i18n/locales/en.json</code>, is the source of truth. Other languages fall back to English key by key. To add a language, add it to <code>src/js/i18n/locales.js</code> with a matching JSON catalog. See <code>src/js/i18n/locales/README.md</code> for details.</p>
+  </main>
+</body>
+</html>

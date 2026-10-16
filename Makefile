@@ -21,7 +21,7 @@ INDENT := $(EMPTY)  $(EMPTY)
 .DEFAULT_GOAL := help
 .PHONY: help install build test clean \
 	frontend frontend-install frontend-build frontend-preview frontend-test \
-	backend backend-build backend-test backend-clean
+	backend backend-build backend-test backend-clean docs
 
 help:
 	$(info Usage: make <target>)
@@ -38,6 +38,7 @@ help:
 	$(info $(INDENT)backend-build      Build the API)
 	$(info $(INDENT)backend-test       Run tests)
 	$(info $(INDENT)backend-clean      Remove build output)
+	$(info $(INDENT)docs               Build the docs site with Javadoc)
 	$(info )
 	$(info All)
 	$(info $(INDENT)install            Install frontend deps)
@@ -76,6 +77,9 @@ backend-test:
 
 backend-clean:
 	cd $(BACKEND_DIR) && $(GRADLE) clean
+
+docs:
+	cd $(BACKEND_DIR) && $(GRADLE) docsSite
 
 # All
 

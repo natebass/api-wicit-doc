@@ -27,3 +27,19 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.named('javadoc') {
+    options.windowTitle = 'WICit API'
+    options.docTitle = 'WICit API'
+}
+
+// Assembles the GitHub Pages site: the pages in docs/ with the Javadoc under api/.
+tasks.register('docsSite', Sync) {
+    group = 'documentation'
+    description = 'Builds the documentation site into build/site.'
+    from 'docs'
+    from(tasks.named('javadoc')) {
+        into 'api'
+    }
+    into layout.buildDirectory.dir('site')
+}

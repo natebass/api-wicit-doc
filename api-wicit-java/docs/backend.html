@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backend Setup · WICit Docs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a class="brand" href="index.html">WICit Docs</a>
+      <a href="prerequisites.html">Prerequisites</a>
+      <a href="backend.html" aria-current="page">Backend</a>
+      <a href="frontend.html">Frontend</a>
+      <a href="api/index.html">Javadoc</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Backend setup</h1>
+    <p class="lead">The WICit API is a Spring Boot application in <code>api-wicit-java</code>, built with Gradle.</p>
+
+    <h2>Requirements</h2>
+    <table>
+      <thead><tr><th>Component</th><th>Version</th></tr></thead>
+      <tbody>
+        <tr><td>Java (toolchain)</td><td>27</td></tr>
+        <tr><td>Gradle (wrapper)</td><td>9.8.1</td></tr>
+        <tr><td>Spring Boot</td><td>4.1.1</td></tr>
+        <tr><td>Spring dependency management plugin</td><td>1.1.7</td></tr>
+        <tr><td>Tests</td><td>JUnit Platform via <code>spring-boot-starter-test</code></td></tr>
+      </tbody>
+    </table>
+    <p>See <a href="prerequisites.html">Prerequisites</a> to install the JDK.</p>
+
+    <h2>Project layout</h2>
+    <table>
+      <thead><tr><th>Path</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td><code>build.gradle</code></td><td>Plugins, Java toolchain, dependencies and the docs site task.</td></tr>
+        <tr><td><code>src/main/java/org/opensac/wicitapi/</code></td><td>Application source. <code>Application</code> is the entry point.</td></tr>
+        <tr><td><code>src/main/resources/application.properties</code></td><td>Spring configuration. The application name is <code>wicit-api</code>.</td></tr>
+        <tr><td><code>src/test/java/</code></td><td>Tests.</td></tr>
+        <tr><td><code>docs/</code></td><td>Source pages for this documentation site.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Configuration</h2>
+    <p>Sensitive settings for the API go in a <code>.env</code> file at the repository root. It is ignored by Git, so never commit it. Ask a maintainer for the values.</p>
+
+    <h2>Run, build and test</h2>
+    <p>From the repository root:</p>
+    <table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>make backend</code></td><td>Runs the API with <code>bootRun</code>.</td></tr>
+        <tr><td><code>make backend-build</code></td><td>Compiles and packages the API, skipping tests.</td></tr>
+        <tr><td><code>make backend-test</code></td><td>Runs the tests.</td></tr>
+        <tr><td><code>make backend-clean</code></td><td>Deletes the <code>build/</code> folder.</td></tr>
+        <tr><td><code>make docs</code></td><td>Builds this site with the Javadoc into <code>api-wicit-java/build/site</code>.</td></tr>
+      </tbody>
+    </table>
+    <p>Without Make, run Gradle from <code>api-wicit-java</code>. Use <code>gradlew.bat</code> on Windows and <code>./gradlew</code> on macOS and Linux:</p>
+<pre><code>cd api-wicit-java
+./gradlew bootRun
+./gradlew test
+./gradlew docsSite</code></pre>
+
+    <h2>Documentation site</h2>
+    <p>The <code>docsSite</code> Gradle task generates the Javadoc and copies it to <code>build/site/api</code>, next to the pages from <code>docs/</code>. Open <code>build/site/index.html</code> in a browser to preview the site.</p>
+    <p>On every push to <code>master</code> that changes <code>api-wicit-java/</code>, the <code>Deploy docs to GitHub Pages</code> workflow builds the site and publishes it to <a href="https://natebass.github.io/api-wicit-doc/">natebass.github.io/api-wicit-doc</a>.</p>
+    <p>Write Javadoc comments on public classes and methods. They appear in the <a href="api/index.html">API reference</a>.</p>
+  </main>
+</body>
+</html>
