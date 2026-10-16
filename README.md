@@ -1,4 +1,21 @@
 # WICit documentation.
 
-Learn about and expriment with the WICit website.
+Learn about and experiment with the WICit website. 
 
+## Running locally
+
+Use Make to run commands from the root of the repository. For development, it is recommended to open the frontend and backend separately in an IDE.
+
+## Deployment
+
+This documentation website is deployed to GitHub Pages.
+
+## Security
+
+Please report any security issues or bugs to product@opensac.org.
+
+## Resources
+
+- [WICit website repository](https://github.com/opensacorg/wicit)
+- [WICit API repository](https://github.com/opensacorg/api-wicit-java)
+- [Contributing guide](.github/CONTRIBUTING.md)
