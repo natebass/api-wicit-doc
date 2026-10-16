@@ -10,8 +10,13 @@ BACKEND_DIR  := api-wicit-java
 ifeq ($(OS),Windows_NT)
 SHELL        := cmd.exe
 GRADLE       := .\gradlew.bat
+DOCS_INDEX   := $(BACKEND_DIR)\build\site\index.html
+# start is a cmd.exe built-in, so call it through cmd.
+OPEN         := cmd /c start ""
 else
 GRADLE       := ./gradlew
+DOCS_INDEX   := $(BACKEND_DIR)/build/site/index.html
+OPEN         := $(if $(filter Darwin,$(shell uname -s)),open,xdg-open)
 endif
 
 # $(info) strips leading spaces, so help lines indent with this.
@@ -21,7 +26,7 @@ INDENT := $(EMPTY)  $(EMPTY)
 .DEFAULT_GOAL := help
 .PHONY: help install build test clean \
 	frontend frontend-install frontend-build frontend-preview frontend-test \
-	backend backend-db backend-build backend-test backend-clean docs
+	backend backend-db backend-build backend-test backend-clean docs docs-preview
 
 help:
 	$(info Usage: make <target>)
@@ -40,6 +45,7 @@ help:
 	$(info $(INDENT)backend-test       Run tests)
 	$(info $(INDENT)backend-clean      Remove build output)
 	$(info $(INDENT)docs               Build the docs site with Javadoc)
+	$(info $(INDENT)docs-preview       Build the docs site and open it in a browser)
 	$(info )
 	$(info All)
 	$(info $(INDENT)install            Install frontend deps)
@@ -84,6 +90,9 @@ backend-clean:
 
 docs:
 	cd $(BACKEND_DIR) && $(GRADLE) docsSite
+
+docs-preview: docs
+	$(OPEN) $(DOCS_INDEX)
 
 # All
 
