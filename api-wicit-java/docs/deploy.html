@@ -10,7 +10,7 @@
 <body>
 <header>
     <nav>
-        <a class="brand" href="index.html"><img alt="WICit" height="30" src="logo.svg" width="75"> Docs</a>
+        <a class="brand" href="index.html"><img alt="WICit" height="30" src="logo.svg" width="75"></a>
         <a href="prerequisites.html">Prerequisites</a>
         <a href="backend.html">Backend</a>
         <a aria-current="page" href="deploy.html">Deployment</a>
@@ -42,7 +42,9 @@
         </tr>
         <tr>
             <td>API URL</td>
-            <td><code>https://44.254.208.38</code>, or <code>https://api.findwic.com</code> once its DNS record is set up</td>
+            <td><code>https://44.254.208.38</code>, or <code>https://api.findwic.com</code> once its DNS record is set
+                up
+            </td>
         </tr>
         <tr>
             <td>Database user</td>
@@ -161,7 +163,8 @@ psql "postgresql://app:PASSWORD@localhost:5432/app_xxxx" -c 'select version();'<
         write the password as it is.</p>
 
     <h2>5. Set the environment variables</h2>
-    <p>The API reads one file, <code>api-wicit-java/.env</code>, whether you start it by hand or as a service. Git ignores it, so it is never
+    <p>The API reads one file, <code>api-wicit-java/.env</code>, whether you start it by hand or as a service. Git
+        ignores it, so it is never
         committed. Create it:</p>
     <pre><code>cd ~/api-wicit-doc/api-wicit-java
 nano .env</code></pre>
