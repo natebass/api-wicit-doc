@@ -133,6 +133,8 @@ jooq {
 }
 
 tasks.named('javadoc') {
+    // The generated jOOQ classes are not part of the documented API.
+    exclude 'org/opensac/wicitapi/jooq/**'
     options.windowTitle = 'WICit API'
     options.docTitle = 'WICit API'
     options.addFileOption('-add-stylesheet', file('src/javadoc/wicit.css'))
