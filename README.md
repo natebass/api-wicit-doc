@@ -2,7 +2,7 @@
 
 Learn about and experiment with the WICit website. 
 
-## Running locally
+## Get started
 
 Use Make to run commands from the root of the repository. See the available commands [here](./Makefile).
 
