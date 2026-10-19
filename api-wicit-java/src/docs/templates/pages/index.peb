@@ -1,25 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>WICit Documentation</title>
-    <link href="favicon.ico" rel="icon">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-<header>
-    <nav>
-        <a aria-current="page" class="brand" href="index.html"><img alt="WICit" height="30" src="logo.svg"
-                                                                    width="75"></a>
-        <a href="get-started.html">Get started</a>
-        <a href="deploy.html">Hosting</a>
-        <a href="data.html">Data</a>
-        <a href="api/index.html">Javadoc</a>
-        <a href="https://api.findwic.com/swagger-ui/index.html">API Explorer</a>
-    </nav>
-</header>
-<main>
+{% extends "base.peb" %}
+{% block title %}WICit Documentation{% endblock %}
+{% block content %}
     <h1>WICit Documentation</h1>
     <p class="lead">Developer documentation for WICit, the site that helps Californians find where to shop with WIC.</p>
 
@@ -58,7 +39,7 @@
             <td>The backend API: Java, Spring Boot and Gradle.</td>
         </tr>
         <tr>
-            <td><code>api-wicit-java/docs/</code></td>
+            <td><code>api-wicit-java/src/docs/</code></td>
             <td>The source of this site.</td>
         </tr>
         <tr>
@@ -73,6 +54,4 @@
 cd api-wicit-doc
 make backend     # start the API
 make frontend    # start the website at http://localhost:5173</code></pre>
-</main>
-</body>
-</html>
+{% endblock %}

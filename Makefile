@@ -11,11 +11,13 @@ ifeq ($(OS),Windows_NT)
 SHELL        := cmd.exe
 GRADLE       := .\gradlew.bat
 DOCS_INDEX   := $(BACKEND_DIR)\build\site\index.html
+DOCS_SITE    := build\site
 # start is a cmd.exe built-in, so call it through cmd.
 OPEN         := cmd /c start ""
 else
 GRADLE       := ./gradlew
 DOCS_INDEX   := $(BACKEND_DIR)/build/site/index.html
+DOCS_SITE    := build/site
 OPEN         := $(if $(filter Darwin,$(shell uname -s)),open,xdg-open)
 endif
 
@@ -26,7 +28,7 @@ INDENT := $(EMPTY)  $(EMPTY)
 .DEFAULT_GOAL := help
 .PHONY: help install build test clean \
 	frontend frontend-install frontend-build frontend-preview frontend-test \
-	backend backend-db backend-build backend-test backend-clean docs docs-preview
+	backend backend-db backend-build backend-test backend-clean docs docs-preview docs-open
 
 help:
 	$(info Usage: make <target>)
@@ -45,7 +47,8 @@ help:
 	$(info $(INDENT)backend-test       Run tests)
 	$(info $(INDENT)backend-clean      Remove build output)
 	$(info $(INDENT)docs               Build the docs site with Javadoc)
-	$(info $(INDENT)docs-preview       Build the docs site and open it in a browser)
+	$(info $(INDENT)docs-preview       Serve the docs site, rebuilding and reloading on changes)
+	$(info $(INDENT)docs-open          Build the docs site and open the files in a browser)
 	$(info )
 	$(info All)
 	$(info $(INDENT)install            Install frontend deps)
@@ -91,7 +94,14 @@ backend-clean:
 docs:
 	cd $(BACKEND_DIR) && $(GRADLE) docsSite
 
+# Gradle's continuous build (-t) reruns docsSite when src/docs or the Java sources change, and
+# browser-sync reloads the browser when build/site changes. CI runs plain docsSite.
 docs-preview: docs
+	cd $(BACKEND_DIR) && pnpm dlx concurrently@10.0.6 --kill-others --names gradle,serve \
+		"$(GRADLE) --continuous --quiet docsSite" \
+		"pnpm dlx browser-sync@3.0.4 start --server $(DOCS_SITE) --files $(DOCS_SITE) --no-notify"
+
+docs-open: docs
 	$(OPEN) $(DOCS_INDEX)
 
 # All

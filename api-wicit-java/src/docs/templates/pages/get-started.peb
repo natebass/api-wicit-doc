@@ -1,24 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>Backend Setup · WICit Documentation</title>
-    <link href="favicon.ico" rel="icon">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-<header>
-    <nav>
-        <a class="brand" href="index.html"><img alt="WICit" height="30" src="logo.svg" width="75"></a>
-        <a aria-current="page" href="get-started.html">Get started</a>
-        <a href="deploy.html">Hosting</a>
-        <a href="data.html">Data</a>
-        <a href="api/index.html">Javadoc</a>
-        <a href="https://api.findwic.com/swagger-ui/index.html">API Explorer</a>
-    </nav>
-</header>
-<main>
+{% extends "base.peb" %}
+{% block title %}Backend Setup{% endblock %}
+{% block content %}
       <h1>Prerequisites</h1>
     <p class="lead">Install these tools before working on WICit. Both projects support Windows, macOS and Linux.</p>
 
@@ -607,6 +589,4 @@ DB_PASSWORD=your-password</code></pre>
     </p>
     <p>Write Javadoc comments on public classes and methods. They appear in the <a href="api/index.html">API
         reference</a>.</p>
-</main>
-</body>
-</html>
+{% endblock %}

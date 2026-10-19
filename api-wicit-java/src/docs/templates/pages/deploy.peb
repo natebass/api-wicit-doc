@@ -1,24 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>Deployment · WICit Documentation</title>
-    <link href="favicon.ico" rel="icon">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-<header>
-    <nav>
-        <a class="brand" href="index.html"><img alt="WICit" height="30" src="logo.svg" width="75"></a>
-        <a href="get-started.html">Get started</a>
-        <a aria-current="page" href="deploy.html">Hosting</a>
-        <a href="data.html">Data</a>
-        <a href="api/index.html">Javadoc</a>
-        <a href="https://api.findwic.com/swagger-ui/index.html">API Explorer</a>
-    </nav>
-</header>
-<main>
+{% extends "base.peb" %}
+{% block title %}Deployment{% endblock %}
+{% block content %}
     <h1>Deploy the API to EC2</h1>
     <p class="lead">The API runs on an AWS EC2 instance, with PostgreSQL on the same machine. The instance serves only
         the backend. The website is hosted on GitHub Pages and calls the API over HTTPS.</p>
@@ -655,6 +637,4 @@ curl https://api.findwic.com/actuator/health</code></pre>
         matter for CORS.</p>
     <p>Once the website uses the new name, you can remove the global options block and the
         <code>44.254.208.38</code> block from the Caddyfile and reload Caddy.</p>
-</main>
-</body>
-</html>
+{% endblock %}

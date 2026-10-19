@@ -1,10 +1,12 @@
-// The Liquibase Gradle plugin reads Liquibase's command definitions at configuration time.
+// The Liquibase Gradle plugin reads Liquibase's command definitions at configuration time. Pebble renders
+// the documentation pages (the docsPages task).
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath 'org.liquibase:liquibase-core:4.33.0'
+        classpath 'io.pebbletemplates:pebble:4.1.2'
     }
 }
 
@@ -140,13 +142,39 @@ tasks.named('javadoc') {
     options.addFileOption('-add-stylesheet', file('src/javadoc/wicit.css'))
 }
 
-// Assembles the GitHub Pages site: the pages in docs/ with the Javadoc under api/. Each Javadoc page gets
+// Renders each template in src/docs/templates/pages to an HTML page of the same name. Pages extend
+// base.peb, which holds the shared head and navigation.
+tasks.register('docsPages') {
+    group = 'documentation'
+    description = 'Renders the documentation pages into build/docs-pages.'
+    def templates = file('src/docs/templates')
+    def output = layout.buildDirectory.dir('docs-pages')
+    inputs.dir templates
+    outputs.dir output
+    doLast {
+        def engine = new io.pebbletemplates.pebble.PebbleEngine.Builder()
+                .loader(new io.pebbletemplates.pebble.loader.FileLoader(templates.path))
+                .build()
+        def outDir = output.get().asFile
+        project.delete(outDir)
+        outDir.mkdirs()
+        file("${templates}/pages").eachFileMatch(~/.*\.peb/) { page ->
+            def name = page.name - '.peb'
+            new File(outDir, "${name}.html").withWriter('UTF-8') { writer ->
+                engine.getTemplate("pages/${page.name}").evaluate(writer, [page: name])
+            }
+        }
+    }
+}
+
+// Assembles the GitHub Pages site: the pages rendered from src/docs and its static files, with the Javadoc under api/. Each Javadoc page gets
 // the site's favicon and, in its navigation bar, the WICit logo linking back to the docs. The links are
 // relative to the page's own folder, so they work under the GitHub Pages project path as well as locally.
 tasks.register('docsSite', Sync) {
     group = 'documentation'
     description = 'Builds the documentation site into build/site.'
-    from 'docs'
+    from tasks.named('docsPages')
+    from 'src/docs/static'
     from(tasks.named('javadoc')) {
         into 'api'
         filesMatching('**/*.html') { details ->

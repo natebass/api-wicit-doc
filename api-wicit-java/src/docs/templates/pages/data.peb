@@ -1,24 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>Data · WICit Documentation</title>
-    <link href="favicon.ico" rel="icon">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-<header>
-    <nav>
-        <a class="brand" href="index.html"><img alt="WICit" height="30" src="logo.svg" width="75"></a>
-        <a href="get-started.html">Get started</a>
-        <a href="deploy.html">Hosting</a>
-        <a aria-current="page" href="data.html">Data</a>
-        <a href="api/index.html">Javadoc</a>
-        <a href="https://api.findwic.com/swagger-ui/index.html">API Explorer</a>
-    </nav>
-</header>
-<main>
+{% extends "base.peb" %}
+{% block title %}Data{% endblock %}
+{% block content %}
     <h1>Published WIC data</h1>
     <p class="lead">The API serves five datasets that the California Department of Public Health (CDPH) publishes on <a
             href="https://data.chhs.ca.gov/">data.chhs.ca.gov</a>.</p>
@@ -172,6 +154,4 @@
         </tbody>
     </table>
     <p>The full API reference is the Swagger UI at <code>/swagger-ui.html</code> on a running API.</p>
-</main>
-</body>
-</html>
+{% endblock %}

@@ -1,24 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>Authorized Product List · WICit Documentation</title>
-    <link href="favicon.ico" rel="icon">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-<header>
-    <nav>
-        <a class="brand" href="index.html"><img alt="WICit" height="30" src="logo.svg" width="75"></a>
-        <a href="get-started.html">Get started</a>
-        <a href="deploy.html">Hosting</a>
-        <a aria-current="page" href="data.html">Data</a>
-        <a href="api/index.html">Javadoc</a>
-        <a href="https://api.findwic.com/swagger-ui/index.html">API Explorer</a>
-    </nav>
-</header>
-<main>
+{% extends "base.peb" %}
+{% block title %}Authorized Product List{% endblock %}
+{% block content %}
     <h1>California WIC Authorized Product List</h1>
     <p class="lead">Source: <a href="https://data.chhs.ca.gov/dataset/wic-authorized-product-list">data.chhs.ca.gov/dataset/wic-authorized-product-list</a>
     </p>
@@ -184,6 +166,4 @@ FROM authorized_product
 WHERE lower(description || ' ' || subcategory_description) LIKE '%brown%'
   AND lower(description || ' ' || subcategory_description) LIKE '%rice%'
 ORDER BY description;</code></pre>
-</main>
-</body>
-</html>
+{% endblock %}

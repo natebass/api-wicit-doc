@@ -1,24 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>Participants by County · WICit Documentation</title>
-    <link href="favicon.ico" rel="icon">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-<header>
-    <nav>
-        <a class="brand" href="index.html"><img alt="WICit" height="30" src="logo.svg" width="75"></a>
-        <a href="get-started.html">Get started</a>
-        <a href="deploy.html">Hosting</a>
-        <a aria-current="page" href="data.html">Data</a>
-        <a href="api/index.html">Javadoc</a>
-        <a href="https://api.findwic.com/swagger-ui/index.html">API Explorer</a>
-    </nav>
-</header>
-<main>
+{% extends "base.peb" %}
+{% block title %}Participants by County{% endblock %}
+{% block content %}
     <h1>WIC Participants by County</h1>
     <p class="lead">Source: <a href="https://data.chhs.ca.gov/dataset/cdph-wic-participants-by-county">data.chhs.ca.gov/dataset/cdph-wic-participants-by-county</a>
     </p>
@@ -228,6 +210,4 @@
 FROM participants_by_category
 WHERE county = 'Sacramento' AND year = 2024 AND month = 6
 ORDER BY category;</code></pre>
-</main>
-</body>
-</html>
+{% endblock %}
